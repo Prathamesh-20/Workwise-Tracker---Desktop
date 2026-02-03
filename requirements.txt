@@ -1,0 +1,27 @@
+# FocusTrack Desktop Agent - Dependencies
+
+# Cross-platform utilities
+psutil>=5.9.0
+
+# Input monitoring
+pynput>=1.7.6
+
+# Windows-specific (only needed on Windows)
+pygetwindow>=0.0.9
+pywin32>=306
+
+# macOS uses built-in AppKit/Quartz (no pip install needed)
+
+# Local database
+# sqlite3 is built into Python
+
+# HTTP client for API sync (Batch 3)
+requests>=2.28.0
+
+# GUI Framework
+customtkinter>=5.2.0
+packaging>=23.0
+Pillow>=10.0.0
+
+# Packaging
+pyinstaller>=6.3.0

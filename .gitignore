@@ -1,0 +1,24 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+
+# PyInstaller outputs (KEEP LOCALLY, IGNORE IN GIT)
+build/
+dist/
+*.spec
+*.exe
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local runtime database
+*.db
