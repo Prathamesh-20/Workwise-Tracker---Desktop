@@ -21,7 +21,7 @@ class SyncManager:
     def __init__(
         self, 
         db: LocalDB,
-        api_base_url: str = "http://localhost:8000",
+        api_base_url: str = "https://web-production-c6ad8.up.railway.app",
         sync_interval: int = 60
     ):
         """
@@ -120,7 +120,8 @@ class SyncManager:
                 "window_title": log["window_title"] or "",
                 "mouse_count": log["mouse_count"],
                 "key_count": log["key_count"],
-                "is_idle": bool(log["is_idle"])
+                "is_idle": bool(log["is_idle"]),
+                "session_id": log.get("session_id") or "default-session"
             })
             log_ids.append(log["id"])
         
@@ -247,7 +248,8 @@ class SyncConfig:
             self._bundled_config = config_file
             self._user_data_file = config_file
         
-        self.api_url: str = "http://localhost:8000"
+        # self.api_url: str = "http://localhost:8000"
+        self.api_url: str = "https://web-production-c6ad8.up.railway.app"
         self.email: Optional[str] = None
         self.token: Optional[str] = None
         
