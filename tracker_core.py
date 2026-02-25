@@ -151,9 +151,10 @@ def _get_windows_active_window() -> Dict[str, str]:
 # INPUT TRACKING (Simplified - no pynput on macOS to avoid crashes)
 # ============================================================================
 
-# Global counters for mouse and keyboard events
+# Global counters for mouse, keyboard, and scroll events
 mouse_count = 0
 key_count = 0
+scroll_count = 0
 
 # Lock for thread-safe counter access
 _counter_lock = threading.Lock()
@@ -177,6 +178,13 @@ def _on_mouse_move(x, y):
     global mouse_count
     with _counter_lock:
         mouse_count += 1
+
+
+def _on_mouse_scroll(x, y, dx, dy):
+    """Callback for mouse scroll events (wheel or trackpad)."""
+    global scroll_count
+    with _counter_lock:
+        scroll_count += 1
 
 
 def _on_key_press(key):
@@ -205,9 +213,10 @@ def start_input_listeners():
     try:
         from pynput import mouse, keyboard
         
-        # Mouse listener (clicks only, not moves - to reduce overhead)
+        # Mouse listener (clicks AND scroll, not moves - to reduce overhead)
         _mouse_listener = mouse.Listener(
-            on_click=_on_mouse_click
+            on_click=_on_mouse_click,
+            on_scroll=_on_mouse_scroll
         )
         _mouse_listener.start()
         
@@ -253,15 +262,17 @@ def stop_input_listeners():
 
 def get_and_reset_counters() -> Dict[str, int]:
     """Get current input counts and reset them to zero."""
-    global mouse_count, key_count
+    global mouse_count, key_count, scroll_count
     
     with _counter_lock:
         counts = {
             "mouse_count": mouse_count,
-            "key_count": key_count
+            "key_count": key_count,
+            "scroll_count": scroll_count
         }
         mouse_count = 0
         key_count = 0
+        scroll_count = 0
     
     return counts
 
@@ -372,7 +383,7 @@ def monitor_loop(interval_seconds: int = 5):
             
             # Get and reset input counters
             input_counts = get_and_reset_counters()
-            total_inputs = input_counts["mouse_count"] + input_counts["key_count"]
+            total_inputs = input_counts["mouse_count"] + input_counts["key_count"] + input_counts["scroll_count"]
             
             # Check if window changed (fallback activity detection for macOS)
             window_changed = check_window_changed(window_info)
@@ -403,7 +414,7 @@ def monitor_loop(interval_seconds: int = 5):
                 "timestamp": datetime.now().isoformat(),
                 "app_name": window_info["app_name"],
                 "window_title": window_info["title"],
-                "mouse_count": input_counts["mouse_count"],
+                "mouse_count": input_counts["mouse_count"] + input_counts["scroll_count"],  # scroll counts as mouse activity
                 "key_count": input_counts["key_count"],
                 "is_idle": is_user_idle
             }
